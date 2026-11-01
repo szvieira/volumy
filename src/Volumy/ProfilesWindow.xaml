@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Volumy.ProfilesWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Volumy.ViewModels"
+    xmlns:loc="using:Volumy.Localization"
+    xmlns:ui="using:Volumy.Interop"
+    Title="Volumy">
+
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid RequestedTheme="Dark" Background="#B3141418">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Custom title bar (drag area) -->
+        <Grid x:Name="TitleBarArea" Padding="16,0,0,0">
+            <TextBlock Text="{x:Bind loc:S.AppName}" FontSize="12" Opacity="0.75" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid Grid.Row="1" Padding="24,8,24,24" RowSpacing="18" ColumnSpacing="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.ColumnSpan="2" Spacing="2">
+                <TextBlock Text="{x:Bind loc:S.ProfilesTitle}" FontSize="28" FontWeight="Bold" />
+                <TextBlock Text="{x:Bind loc:S.ProfilesSubtitle}" Opacity="0.8" />
+            </StackPanel>
+            <ui:HandButton Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Click="New_Click"
+                    CornerRadius="20" MinHeight="40" Padding="16,0" Background="#24FFFFFF" BorderBrush="#47FFFFFF">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE710;" FontSize="14" />
+                    <TextBlock Text="{x:Bind loc:S.NewProfile}" FontWeight="SemiBold" />
+                </StackPanel>
+            </ui:HandButton>
+
+            <!-- Left column: profile list + app-wide settings -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,4,0">
+            <StackPanel Spacing="16">
+                <Border Style="{StaticResource GlassCard}" Padding="6">
+                    <ListView x:Name="ProfileList" SelectionMode="Single" SelectionChanged="ProfileList_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ProfileListItem">
+                                <StackPanel Orientation="Horizontal" Spacing="12" Padding="2,10">
+                                    <Border Width="36" Height="36" CornerRadius="18" Background="{x:Bind CircleBrush}">
+                                        <TextBlock Text="{x:Bind Initial}" Foreground="#111114" FontWeight="Bold"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{x:Bind Subtitle}" FontSize="12" Opacity="0.75" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+
+                <Border Style="{StaticResource GlassCard}" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="{x:Bind loc:S.General}" FontSize="16" FontWeight="SemiBold" />
+                        <ui:HandComboBox x:Name="LanguageBox" Header="{x:Bind loc:S.LanguageLabel}" DisplayMemberPath="Name"
+                                  HorizontalAlignment="Stretch" CornerRadius="10" SelectionChanged="LanguageBox_SelectionChanged" />
+                        <ToggleSwitch x:Name="RestoreToggle" OnContent="{x:Bind loc:S.On}" OffContent="{x:Bind loc:S.Off}" Header="{x:Bind loc:S.RestoreOnStart}" Toggled="RestoreToggle_Toggled" />
+                        <ToggleSwitch x:Name="SoundToggle" OnContent="{x:Bind loc:S.On}" OffContent="{x:Bind loc:S.Off}" Header="{x:Bind loc:S.PlaySoundToggle}" Toggled="SoundToggle_Toggled" />
+                        <ToggleSwitch x:Name="StartupToggle" OnContent="{x:Bind loc:S.On}" OffContent="{x:Bind loc:S.Off}" Header="{x:Bind loc:S.StartWithWindows}" Toggled="StartupToggle_Toggled" />
+                        <ui:ShortcutBox x:Name="MicHotkeyBox" Header="{x:Bind loc:S.MicHotkeyLabel}" CornerRadius="10" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            </ScrollViewer>
+
+            <!-- Editor -->
+            <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="16" Padding="0,0,12,0">
+
+                    <Border Style="{StaticResource GlassCard}" Padding="20">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="{x:Bind loc:S.Identity}" FontSize="16" FontWeight="SemiBold" />
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="4">
+                                    <TextBox x:Name="NameBox" Header="{x:Bind loc:S.Name}" CornerRadius="10" MaxLength="20"
+                                             TextChanged="NameBox_TextChanged" />
+                                    <TextBlock x:Name="NameCounter" FontSize="11" Opacity="0.6" HorizontalAlignment="Right" />
+                                </StackPanel>
+                                <ui:ShortcutBox x:Name="HotkeyBox" Grid.Column="1" Header="{x:Bind loc:S.Hotkey}" CornerRadius="10" />
+                            </Grid>
+                            <TextBlock Text="{x:Bind loc:S.HotkeyHelp}" FontSize="12" Opacity="0.7" TextWrapping="Wrap" />
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="{x:Bind loc:S.Color}" FontSize="14" />
+                                <StackPanel x:Name="ColorPanel" Orientation="Horizontal" Spacing="8" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource GlassCard}" Padding="20">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="{x:Bind loc:S.SwitchSound}" FontSize="16" FontWeight="SemiBold" />
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:HandComboBox x:Name="SoundBox" DisplayMemberPath="Name" HorizontalAlignment="Stretch" CornerRadius="10"
+                                          SelectionChanged="SoundBox_SelectionChanged"
+                                          AutomationProperties.Name="{x:Bind loc:S.SwitchSound}" />
+                                <ui:HandButton Grid.Column="1" Click="PreviewSound_Click" Width="40" Height="34" Padding="0" CornerRadius="17"
+                                        Background="#24FFFFFF" BorderBrush="#47FFFFFF"
+                                        ToolTipService.ToolTip="{x:Bind loc:S.Preview}" AutomationProperties.Name="{x:Bind loc:S.Preview}">
+                                    <FontIcon Glyph="&#xE768;" FontSize="13" />
+                                </ui:HandButton>
+                                <ui:HandButton Grid.Column="2" Click="ChooseSound_Click" CornerRadius="17" MinHeight="34" Padding="14,0"
+                                        Background="#24FFFFFF" BorderBrush="#47FFFFFF" Content="{x:Bind loc:S.ChooseFile}" />
+                            </Grid>
+                            <TextBlock Text="{x:Bind loc:S.SoundHelp}" FontSize="12" Opacity="0.7" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource GlassCard}" Padding="20">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="{x:Bind loc:S.Activation}" FontSize="16" FontWeight="SemiBold" />
+                            <ui:HandComboBox x:Name="AutoDeviceBox" Header="{x:Bind loc:S.AutoSwitchDevice}"
+                                      DisplayMemberPath="Name" HorizontalAlignment="Stretch" CornerRadius="10" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource GlassCard}" Padding="20">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="{x:Bind loc:S.DefaultDevices}" FontSize="16" FontWeight="SemiBold" />
+                            <ui:HandComboBox x:Name="PlaybackBox" Header="{x:Bind loc:S.Output}" DisplayMemberPath="Name"
+                                      HorizontalAlignment="Stretch" CornerRadius="10" />
+                            <ui:HandComboBox x:Name="CommunicationsBox" Header="{x:Bind loc:S.Communications}" DisplayMemberPath="Name"
+                                      HorizontalAlignment="Stretch" CornerRadius="10" />
+                            <ui:HandComboBox x:Name="MicrophoneBox" Header="{x:Bind loc:S.Microphone}" DisplayMemberPath="Name"
+                                      HorizontalAlignment="Stretch" CornerRadius="10" />
+                            <TextBlock Text="{x:Bind loc:S.DeviceVolumeHelp}" FontSize="12" Opacity="0.7" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource GlassCard}" Padding="20">
+                        <StackPanel Spacing="10">
+                            <Grid>
+                                <TextBlock Text="{x:Bind loc:S.AppRules}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <ui:HandButton HorizontalAlignment="Right" Click="AddApps_Click" CornerRadius="18"
+                                        Background="#1FFFFFFF" BorderBrush="#3DFFFFFF" Content="{x:Bind loc:S.AddPlayingApps}" />
+                            </Grid>
+                            <TextBlock x:Name="NoRulesText" Text="{x:Bind loc:S.NoRules}" Opacity="0.7" FontSize="13" />
+                            <ItemsControl x:Name="RulesList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:RuleItem">
+                                        <Grid ColumnSpacing="12" Padding="0,6" BorderBrush="#1FFFFFFF" BorderThickness="0,0,0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="170" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="48" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{x:Bind Exe}" FontFamily="Cascadia Mono, Consolas" FontSize="13"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                            <Slider Grid.Column="1" Maximum="100" VerticalAlignment="Center"
+                                                    Value="{x:Bind Volume, Mode=TwoWay}" AutomationProperties.Name="{x:Bind Exe}" />
+                                            <TextBlock Grid.Column="2" Text="{x:Bind VolumeText, Mode=OneWay}" VerticalAlignment="Center"
+                                                       HorizontalAlignment="Right" Opacity="0.85" />
+                                            <ui:HandCheckBox Grid.Column="3" Content="{x:Bind loc:S.Muted}" MinWidth="0" IsChecked="{x:Bind Muted, Mode=TwoWay}" />
+                                            <ui:HandButton Grid.Column="4" Tag="{x:Bind Exe}" Click="RemoveRule_Click" Width="36" Height="36"
+                                                    Padding="0" CornerRadius="18" Background="Transparent" BorderThickness="0"
+                                                    ToolTipService.ToolTip="{x:Bind loc:S.RemoveRule}" AutomationProperties.Name="{x:Bind loc:S.RemoveRule}">
+                                                <FontIcon Glyph="&#xE711;" FontSize="12" />
+                                            </ui:HandButton>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:HandButton x:Name="DeleteButton" Click="Delete_Click" CornerRadius="22" MinHeight="44" Padding="18,0"
+                                Background="Transparent" BorderBrush="#4DFF9B8F" Foreground="#FFB4AB" Content="{x:Bind loc:S.DeleteProfile}" />
+                        <TextBlock x:Name="StatusText" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                   Opacity="0.85" TextWrapping="Wrap" Margin="12,0" />
+                        <ui:HandButton Grid.Column="2" Click="Capture_Click" CornerRadius="22" MinHeight="44" Padding="18,0"
+                                Background="#24FFFFFF" BorderBrush="#47FFFFFF" Content="{x:Bind loc:S.CaptureState}"
+                                ToolTipService.ToolTip="{x:Bind loc:S.CaptureStateTip}" />
+                        <ui:HandButton Grid.Column="3" Click="Save_Click" Style="{StaticResource PrimaryGlassButton}" Padding="26,0"
+                                Content="{x:Bind loc:S.SaveProfile}">
+                            <Button.Resources>
+                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#FFFFFFFF" />
+                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#D9FFFFFF" />
+                                <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FF111114" />
+                                <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#FF111114" />
+                            </Button.Resources>
+                        </ui:HandButton>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

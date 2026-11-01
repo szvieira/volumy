@@ -1,0 +1,52 @@
+name: Release
+
+# Push a tag like v1.0.0 and this builds the installer + portable zip and publishes a GitHub Release:
+#   git tag v1.0.0
+#   git push origin v1.0.0
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart("v")
+          "value=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Publish (self-contained, x64)
+        run: >
+          dotnet publish src/Volumy/Volumy.csproj -c Release -p:Platform=x64 -r win-x64
+          --self-contained true -p:Version=${{ steps.version.outputs.value }}
+          -o publish/Volumy
+
+      - name: Portable zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive -Path publish/Volumy/* -DestinationPath "dist/Volumy-${{ steps.version.outputs.value }}-portable-x64.zip"
+
+      - name: Installer
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=${{ steps.version.outputs.value }} installer\Volumy.iss
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
