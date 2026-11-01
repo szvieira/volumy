@@ -9,7 +9,7 @@ if errorlevel 1 (
   echo Build failed. Errors:
   findstr /i /c:" error " build.log
   echo.
-  echo Full log saved to build.log - tell Claude to read it.
+  echo Full log saved to build.log.
   pause
   exit /b 1
 )
