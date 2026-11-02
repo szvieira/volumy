@@ -4,7 +4,7 @@ name: Release
 #   - the <Version> in src/Volumy/Volumy.csproj changes on main (the tag vX.Y.Z is created for you),
 #   - a tag like v1.0.0 is pushed,
 #   - or you click "Run workflow" on the Actions tab.
-# If a release for that version already exists, it does nothing.
+# If a release for that version already exists, the run does nothing.
 on:
   push:
     branches: [main]
