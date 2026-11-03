@@ -236,6 +236,13 @@ public sealed class ProfileManager
         _store.Save(Data);
     }
 
+    public void SetCheckForUpdates(bool value)
+    {
+        if (Data.CheckForUpdates == value) return;
+        Data.CheckForUpdates = value;
+        _store.Save(Data);
+    }
+
     public void SetPlaySound(bool value)
     {
         if (Data.PlaySound == value) return;

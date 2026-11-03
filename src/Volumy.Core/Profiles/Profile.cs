@@ -68,6 +68,9 @@ public sealed class ProfileFile
     /// <summary>Play a chime when the profile changes.</summary>
     public bool PlaySound { get; set; } = true;
 
+    /// <summary>Look for new versions on GitHub and offer to install them.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+
     /// <summary>UI language: "en" (default) or "pt-BR".</summary>
     public string Language { get; set; } = "en";
 

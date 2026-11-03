@@ -59,6 +59,7 @@ public sealed partial class ProfilesWindow : Window
         _loading = true;
         RestoreToggle.IsOn = _profiles.Data.RestoreOnStartup;
         SoundToggle.IsOn = _profiles.Data.PlaySound;
+        UpdatesToggle.IsOn = _profiles.Data.CheckForUpdates;
         StartupToggle.IsOn = Startup.IsEnabled;
         MicHotkeyBox.Text = _profiles.Data.MicMuteHotkey ?? "";
         MicHotkeyBox.Recorded += (box, text) => Guard.Run("mic shortcut", () => OnMicHotkeyRecorded(box, text));
@@ -406,6 +407,12 @@ public sealed partial class ProfilesWindow : Window
     private void RestoreToggle_Toggled(object sender, RoutedEventArgs e)
     {
         if (!_loading) _profiles.SetRestoreOnStartup(RestoreToggle.IsOn);
+    }
+
+    private void UpdatesToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        _profiles.SetCheckForUpdates(UpdatesToggle.IsOn);
     }
 
     private void SoundToggle_Toggled(object sender, RoutedEventArgs e)

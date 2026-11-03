@@ -120,6 +120,15 @@ public static class S
     public static string MicHotkeyLabel => T("Mic mute shortcut", "Atalho para silenciar o microfone");
     public static string MicHotkeyInUse => T("That shortcut already mutes the microphone.", "Esse atalho já silencia o microfone.");
     public static string MicHotkeySaved => T("Mic shortcut saved.", "Atalho do microfone salvo.");
+    public static string CheckUpdatesToggle => T("Check for updates", "Procurar atualizações");
+    public static string UpdateAvailable(string v) => T($"Volumy {v} is available", $"Volumy {v} disponível");
+    public static string UpdateHint => T("Right-click the tray icon to install it.", "Clique com o botão direito no ícone da bandeja para instalar.");
+    public static string MenuInstallUpdate(string v) => T($"Install update {v}", $"Instalar atualização {v}");
+    public static string MenuDownloadUpdate(string v) => T($"Download update {v}", $"Baixar atualização {v}");
+    public static string UpdateDownloading => T("Downloading update…", "Baixando atualização…");
+    public static string UpdateRestarts => T("Volumy will restart by itself.", "O Volumy vai reiniciar sozinho.");
+    public static string UpdateFailed => T("Couldn't install the update", "Não deu para instalar a atualização");
+    public static string UpdateOpenedPage => T("Opened the download page instead.", "Abri a página de download.");
     public static string StartWithWindows => T("Start with Windows", "Iniciar com o Windows");
     public static string LanguageLabel => T("Language", "Idioma");
     public static string LanguageRestart => T("The app restarts to change the language.", "O app reinicia para trocar o idioma.");

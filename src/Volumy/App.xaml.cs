@@ -24,6 +24,8 @@ public partial class App : Application
     private ProfilesWindow? _editor;
     private ToastWindow? _toast; // created on demand, closed after it fades out (saves ~15–25 MB idle)
     private TrayMouseHook? _trayHook;
+    private UpdateChecker? _updates;
+    private bool _installingUpdate;
     private const string MicHotkeyId = "__mic";
     private bool _started;
     private int _devicesRefreshPending;
@@ -139,6 +141,15 @@ public partial class App : Application
         }
         CrashLog.Trace("started");
         _started = true;
+        if (!DemoMode.IsOn)
+        {
+            Guard.Run("update checker", () =>
+            {
+                _updates = new UpdateChecker(_ui, () => _profiles.Data.CheckForUpdates);
+                _updates.UpdateFound += v => Toast().Show("\uE896", S.UpdateAvailable(v.ToString(3)), S.UpdateHint, isGlyph: true);
+                _updates.Start();
+            });
+        }
         MemoryTrimmer.TrimSoon(); // startup allocates a lot it never needs again
     }
 
@@ -226,6 +237,12 @@ public partial class App : Application
         if (_flyout.IsOpen) _flyout.HideFlyout();
 
         var items = new List<TrayMenuItem>();
+        if (_updates?.Available is Version update)
+        {
+            var label = UpdateChecker.IsInstalled ? S.MenuInstallUpdate(update.ToString(3)) : S.MenuDownloadUpdate(update.ToString(3));
+            items.Add(new TrayMenuItem("\uE896", label, InstallUpdate, IsEnabled: !_installingUpdate));
+            items.Add(TrayMenuItem.Separator);
+        }
         foreach (var (id, profile) in _profiles.Data.Profiles)
         {
             var profileId = id;
@@ -252,6 +269,27 @@ public partial class App : Application
         _menu ??= new TrayMenuWindow();
         _menu.ShowAt(items, x, y);
         if (_trayHook != null) _trayHook.WatchClicks = true;
+    }
+
+    private async void InstallUpdate()
+    {
+        if (_updates == null || _installingUpdate) return;
+        _installingUpdate = true;
+        try
+        {
+            if (UpdateChecker.IsInstalled) Toast().ShowGlyph("\uE896", S.UpdateDownloading, S.UpdateRestarts);
+            if (await _updates.InstallAsync()) Quit();
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Write("install update", ex);
+            Toast().Show("!", S.UpdateFailed, S.UpdateOpenedPage);
+            _updates.OpenPage();
+        }
+        finally
+        {
+            _installingUpdate = false;
+        }
     }
 
     /// <summary>Closes the menu when the user clicks anywhere outside it (works even if it never got focus).</summary>

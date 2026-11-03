@@ -35,6 +35,8 @@
 
 Prefer no installer? Download the **portable zip**, extract it anywhere and run `Volumy.exe`.
 
+**Updates:** Volumy checks GitHub for new versions. When there's one, it tells you, and **right-click the tray icon → Install update** downloads and installs it, then restarts the app. Your profiles are kept. (The portable version opens the download page instead.) You can turn the check off in **Configure profiles → General**.
+
 > **"Windows protected your PC"**: the app isn't code-signed yet, so SmartScreen warns on first run. Click **More info → Run anyway**.
 
 Requires Windows 10 1809 or later (x64). Built and tested on Windows 11.
@@ -78,6 +80,6 @@ The default-device switching follows the approach of [EarTrumpet](https://github
 
 **Perfis de áudio por pessoa para o Windows.** Cada perfil guarda a saída, o microfone, os volumes e as regras por app de quem usa o PC. Trocar de perfil leva um clique ou um atalho.
 
-**Instalar:** baixe o **`Volumy-Setup-x.y.z.exe`** em **[Releases](../../releases/latest)** e execute. Não pede admin e não precisa instalar o .NET. Se o Windows avisar "O Windows protegeu o computador", clique em **Mais informações → Executar assim mesmo** (o app ainda não tem assinatura digital).
+**Instalar:** baixe o **`Volumy-Setup-x.y.z.exe`** em **[Releases](../../releases/latest)** e execute. Não pede admin e não precisa instalar o .NET. Depois disso, o próprio app avisa quando sai uma versão nova: **clique com o botão direito no ícone da bandeja → Instalar atualização**. Se o Windows avisar "O Windows protegeu o computador", clique em **Mais informações → Executar assim mesmo** (o app ainda não tem assinatura digital).
 
 O idioma do app pode ser trocado para português em **Configurar perfis → Geral → Idioma**.

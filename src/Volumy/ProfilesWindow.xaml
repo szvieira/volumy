@@ -76,6 +76,7 @@
                         <ToggleSwitch x:Name="RestoreToggle" OnContent="{x:Bind loc:S.On}" OffContent="{x:Bind loc:S.Off}" Header="{x:Bind loc:S.RestoreOnStart}" Toggled="RestoreToggle_Toggled" />
                         <ToggleSwitch x:Name="SoundToggle" OnContent="{x:Bind loc:S.On}" OffContent="{x:Bind loc:S.Off}" Header="{x:Bind loc:S.PlaySoundToggle}" Toggled="SoundToggle_Toggled" />
                         <ToggleSwitch x:Name="StartupToggle" OnContent="{x:Bind loc:S.On}" OffContent="{x:Bind loc:S.Off}" Header="{x:Bind loc:S.StartWithWindows}" Toggled="StartupToggle_Toggled" />
+                        <ToggleSwitch x:Name="UpdatesToggle" OnContent="{x:Bind loc:S.On}" OffContent="{x:Bind loc:S.Off}" Header="{x:Bind loc:S.CheckUpdatesToggle}" Toggled="UpdatesToggle_Toggled" />
                         <ui:ShortcutBox x:Name="MicHotkeyBox" Header="{x:Bind loc:S.MicHotkeyLabel}" CornerRadius="10" />
                     </StackPanel>
                 </Border>
