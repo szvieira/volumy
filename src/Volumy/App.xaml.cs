@@ -394,6 +394,7 @@ public partial class App : Application
     private void Quit(bool relaunch)
     {
         // Each step on its own: one failing cleanup must not stop the app from exiting.
+        Guard.Run("quit: save volumes", () => _flyout.ViewModel.FlushVolumes());
         Guard.Run("quit: editor", () => _editor?.Close());
         Guard.Run("quit: menu", () => _menu?.CloseForExit());
         Guard.Run("quit: flyout", () => _flyout.CloseForExit());

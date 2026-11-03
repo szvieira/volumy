@@ -30,6 +30,41 @@ public sealed class FlyoutViewModel : ObservableObject
         _ui = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
     }
 
+    private Microsoft.UI.Dispatching.DispatcherQueueTimer? _saveTimer;
+
+    /// <summary>Writes volume changes to profiles.json shortly after the user stops dragging.</summary>
+    private void SaveSoon()
+    {
+        if (_saveTimer == null)
+        {
+            _saveTimer = _ui.CreateTimer();
+            _saveTimer.Interval = TimeSpan.FromMilliseconds(600);
+            _saveTimer.IsRepeating = false;
+            _saveTimer.Tick += (_, _) => Volumy.Services.Guard.Run("save volumes", _profiles.SaveIfDirty);
+        }
+        _saveTimer.Stop();
+        _saveTimer.Start();
+    }
+
+    /// <summary>Saves pending volume changes now (flyout hidden, app quitting).</summary>
+    public void FlushVolumes()
+    {
+        _saveTimer?.Stop();
+        _profiles.SaveIfDirty();
+    }
+
+    private void OnAppChangedByUser(AppItem app)
+    {
+        _profiles.RememberApp(app.Exe, (float)(app.Volume / 100.0), app.Muted);
+        SaveSoon();
+    }
+
+    private void RememberDevice(string id, double volume, bool muted)
+    {
+        _profiles.RememberDevice(id, (float)(volume / 100.0), muted);
+        SaveSoon();
+    }
+
     public ObservableCollection<ProfileChip> Profiles { get; } = new();
     public ObservableCollection<DeviceItem> Outputs { get; } = new();
     public ObservableCollection<DeviceItem> Inputs { get; } = new();
@@ -54,7 +89,11 @@ public sealed class FlyoutViewModel : ObservableObject
         {
             if (!Set(ref _outputVolume, value)) return;
             OnPropertyChanged(nameof(OutputVolumeText));
-            if (!_refreshing && CurrentOutputId is string id) _audio.SetDeviceVolume(id, (float)(value / 100.0));
+            if (!_refreshing && CurrentOutputId is string id)
+            {
+                _audio.SetDeviceVolume(id, (float)(value / 100.0));
+                RememberDevice(id, value, _outputMuted);
+            }
         }
     }
 
@@ -67,7 +106,11 @@ public sealed class FlyoutViewModel : ObservableObject
         {
             if (!Set(ref _outputMuted, value)) return;
             OnPropertyChanged(nameof(OutputGlyph));
-            if (!_refreshing && CurrentOutputId is string id) _audio.SetDeviceMute(id, value);
+            if (!_refreshing && CurrentOutputId is string id)
+            {
+                _audio.SetDeviceMute(id, value);
+                RememberDevice(id, _outputVolume, value);
+            }
         }
     }
 
@@ -80,7 +123,11 @@ public sealed class FlyoutViewModel : ObservableObject
         {
             if (!Set(ref _inputVolume, value)) return;
             OnPropertyChanged(nameof(InputVolumeText));
-            if (!_refreshing && CurrentInputId is string id) _audio.SetDeviceVolume(id, (float)(value / 100.0));
+            if (!_refreshing && CurrentInputId is string id)
+            {
+                _audio.SetDeviceVolume(id, (float)(value / 100.0));
+                RememberDevice(id, value, _inputMuted);
+            }
         }
     }
 
@@ -338,7 +385,7 @@ public sealed class FlyoutViewModel : ObservableObject
             Apps.Clear();
             foreach (var app in current)
             {
-                Apps.Add(new AppItem(_audio, app));
+                Apps.Add(new AppItem(_audio, app, OnAppChangedByUser));
             }
         }
         OnPropertyChanged(nameof(NoAppsVisibility));

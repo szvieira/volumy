@@ -90,13 +90,15 @@ public sealed class AppItem : ObservableObject
     private static readonly SolidColorBrush NeutralAccent = new(ColorHelper.FromArgb(0xFF, 0xD8, 0xD8, 0xE0));
 
     private readonly AudioService _audio;
+    private readonly Action<AppItem>? _changedByUser;
     private bool _syncing;
     private double _volume;
     private bool _muted;
 
-    public AppItem(AudioService audio, AppAudio app)
+    public AppItem(AudioService audio, AppAudio app, Action<AppItem>? changedByUser = null)
     {
         _audio = audio;
+        _changedByUser = changedByUser;
         Exe = app.Exe;
         Name = app.DisplayName;
         Letters = Name.Length >= 2 ? Name[..2] : Name;
@@ -136,7 +138,9 @@ public sealed class AppItem : ObservableObject
         {
             if (!Set(ref _volume, value)) return;
             OnPropertyChanged(nameof(VolumeText));
-            if (!_syncing) _audio.SetAppVolume(Exe, (float)(value / 100.0));
+            if (_syncing) return;
+            _audio.SetAppVolume(Exe, (float)(value / 100.0));
+            _changedByUser?.Invoke(this);
         }
     }
 
@@ -149,7 +153,9 @@ public sealed class AppItem : ObservableObject
         {
             if (!Set(ref _muted, value)) return;
             OnPropertyChanged(nameof(MuteGlyph));
-            if (!_syncing) _audio.SetAppMute(Exe, value);
+            if (_syncing) return;
+            _audio.SetAppMute(Exe, value);
+            _changedByUser?.Invoke(this);
         }
     }
 

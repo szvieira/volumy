@@ -189,6 +189,7 @@ public sealed partial class FlyoutWindow : Window
     {
         Services.CrashLog.Trace("flyout: hide");
         _meterTimer?.Stop();
+        Services.Guard.Run("save volumes", ViewModel.FlushVolumes);
         AppWindow.Hide();
         _hiddenAt = DateTime.UtcNow;
         Services.MemoryTrimmer.TrimSoon();

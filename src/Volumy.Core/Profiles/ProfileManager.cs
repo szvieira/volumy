@@ -110,6 +110,54 @@ public sealed class ProfileManager
         }
     }
 
+    private bool _dirty;
+
+    /// <summary>
+    /// The user changed an app's volume or mute: remember it in the active profile, so switching
+    /// away and back restores it. Kept in memory; call <see cref="SaveIfDirty"/> to write it.
+    /// </summary>
+    public void RememberApp(string exe, float volume, bool muted)
+    {
+        var profile = Active;
+        if (profile == null || string.IsNullOrEmpty(exe)) return;
+        if (!profile.Apps.TryGetValue(exe, out var rule))
+        {
+            rule = new AppRule();
+            profile.Apps[exe] = rule;
+        }
+        rule.Volume = (float)Math.Round(volume, 2);
+        rule.Muted = muted;
+        _dirty = true;
+    }
+
+    /// <summary>The user changed a device's volume or mute in the flyout: remember it in the active profile.</summary>
+    public void RememberDevice(string deviceId, float volume, bool muted)
+    {
+        var profile = Active;
+        if (profile == null || string.IsNullOrEmpty(deviceId)) return;
+        var setting = profile.Devices.FirstOrDefault(d => d.Id == deviceId);
+        if (setting == null)
+        {
+            var device = _audio.GetDevices(DeviceFlow.Playback)
+                .Concat(_audio.GetDevices(DeviceFlow.Capture))
+                .FirstOrDefault(d => d.Id == deviceId);
+            if (device == null) return;
+            setting = new DeviceSetting { Id = device.Id, Name = device.Name };
+            profile.Devices.Add(setting);
+        }
+        setting.Volume = (float)Math.Round(volume, 2);
+        setting.Muted = muted;
+        _dirty = true;
+    }
+
+    /// <summary>Writes changes from <see cref="RememberApp"/> / <see cref="RememberDevice"/>.</summary>
+    public void SaveIfDirty()
+    {
+        if (!_dirty) return;
+        _dirty = false;
+        _store.Save(Data);
+    }
+
     /// <summary>Overwrites a profile's devices and volumes with what is set right now.</summary>
     public void SaveCurrentInto(string profileId)
     {

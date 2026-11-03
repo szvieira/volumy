@@ -21,6 +21,7 @@
 - **Profiles**: name, color, global shortcut and switch sound for each person.
   - Switch from the flyout, the right-click menu or a shortcut (`Ctrl+Alt+1`, `Ctrl+Alt+2`…).
   - Switches automatically when a chosen device (e.g. a headset) is plugged in.
+  - Volume changes you make in the flyout are saved to the active profile automatically, per app and per device.
   - Per-app volume rules are applied as soon as an app starts playing.
   - 8 built-in switch sounds, or use your own file.
 - **Tray icon**: scroll to change volume, middle-click to mute; a red badge shows when the mic is muted.
